@@ -1,36 +1,52 @@
 import React, { useState, useEffect } from "react";
 import {useLoaderData} from "react-router-dom";
 function GitHub() {
-    const data = useLoaderData();
-//   const [data, setData] = useState([]);
-//   useEffect(() => {
-//     fetch("https://api.github.com/users/buddhamagar-09")
-//       .then((resolve) => resolve.json())
-//       .then((data) => {
-//         console.log(data);
-//         setData(data);
-//       });
-//   }, []);
-  return (
-    <div className="h-124 w-full bg-gray-700 flex  flex-col space-y-10">
-      <div className=" h-24 flex items-center justify-center text-white mt-10 space-x-10">
-        <h1 className="font-bold text-3xl">Name: {data.login}</h1>
-        <p className="text-xl">Id:{data.id}</p>
+  const data = useLoaderData();
+
+  if (!data) {
+    return (
+      <div className="text-white text-center mt-10">
+        Failed to load GitHub profile
       </div>
-    <div className="flex space-x-8 items-center justify-center text-white">
-        
-      <img src={data.avatar_url} alt="" className="h-64 w-64" />
-      <p className="">Bio: {data.bio}</p>
-    </div>
-      
+    );
+  }
+
+  return (
+    <div className="min-h-screen w-full bg-white dark:bg-slate-900 text-black dark:text-white flex flex-col space-y-10 items-center justify-center">
+
+      <h1 className="font-bold text-3xl">
+        Name: {data.login}
+      </h1>
+
+      <p className="text-xl">Id: {data.id}</p>
+
+      <img
+        src={data.avatar_url}
+        alt={data.login}
+        className="h-64 w-64 rounded-full border-4 border-white"
+      />
+
+      <p className="max-w-md text-center">
+        Bio: {data.bio || "No bio available"}
+      </p>
     </div>
   );
 }
 export default GitHub;
 
 export const GithubInfoLoader = async () => {
-    let response = await fetch('https://api.github.com/users/buddhamagar-09');
+  try {
+    const response = await fetch(
+      "https://api.github.com/users/buddhamagar-09"
+    );
 
-    let data = await response.json();
-    return data;
-}
+    if (!response.ok) {
+      throw new Error("Failed to fetch GitHub data");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
